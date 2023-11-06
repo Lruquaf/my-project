@@ -1,23 +1,35 @@
 import { GetStaticProps, NextPage } from "next";
-import { ImageData } from "./imageData";
 import styles from "../styles/Home.module.css";
-import { MediaRenderer } from "@thirdweb-dev/react";
 import { useState } from "react";
 import Modal from "./Modal";
+import { MediaRenderer } from "@thirdweb-dev/react";
+import { textContentList } from "./data";
 
-interface AlmanacProps {
-    data: ImageData[];
+// interface AlmanacProps {
+//     textContentList: TextContent[];
+// }
+
+interface TextContent {
+    id: string;
+    name: string;
+    description: string;
+    image: string;
 }
 
-const Almanac: NextPage<AlmanacProps> = ({ data }) => {
+const Almanac: NextPage = () => {
     const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [expandedCard, setExpandedCard] = useState<TextContent | null>(null);
 
     const handleCardClick = (id: string | null) => {
         if (expandedCardId === id) {
             setExpandedCardId(null);
         } else {
             setExpandedCardId(id);
+            const card = textContentList.find((item) => item.id === id);
+            if (card) {
+                setExpandedCard(card);
+            }
             setIsModalOpen(true);
         }
     };
@@ -26,14 +38,12 @@ const Almanac: NextPage<AlmanacProps> = ({ data }) => {
         setIsModalOpen(false);
     };
 
-    const expandedCard = data.find((item) => item.id === expandedCardId);
-
     return (
         <div className={styles.container}>
             <h1>Almanac</h1>
             <hr />
             <div className={styles.grid}>
-                {data.map((item) => (
+                {textContentList.map((item) => (
                     <div
                         className={`${styles.card} ${
                             expandedCardId === item.id ? styles.expanded : ""
@@ -43,7 +53,9 @@ const Almanac: NextPage<AlmanacProps> = ({ data }) => {
                     >
                         <MediaRenderer
                             className={styles.general}
-                            src={item.image as string}
+                            src={item.image}
+                            width="160px"
+                            height="160px"
                         />
                         <div className={styles.idName}>
                             <p>#{item.id}</p>
@@ -61,7 +73,10 @@ const Almanac: NextPage<AlmanacProps> = ({ data }) => {
                             <h2>{expandedCard?.name}</h2>
                             <div className={styles.modalImageDesc}>
                                 <MediaRenderer
-                                    src={expandedCard?.image as string}
+                                    className={styles.general}
+                                    src={expandedCard?.image}
+                                    width="160px"
+                                    height="160px"
                                 />
                                 <p className={styles.generalDescription}>
                                     {expandedCard?.description}
@@ -73,17 +88,6 @@ const Almanac: NextPage<AlmanacProps> = ({ data }) => {
             />
         </div>
     );
-};
-
-export const getStaticProps: GetStaticProps<AlmanacProps> = async () => {
-    const response = await fetch("/api/getImagesData");
-    const data = await response.json();
-
-    return {
-        props: {
-            data,
-        },
-    };
 };
 
 export default Almanac;
