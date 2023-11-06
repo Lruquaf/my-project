@@ -4,6 +4,10 @@ import { CONTRACT_ABI } from "../../const/abis";
 import styles from "../../styles/Home.module.css";
 
 function NFTGallery({ tokenIds }: { tokenIds: number[] }) {
+    if (!tokenIds) {
+        return <p>No tokenIds provided.</p>; // Handle the case where tokenIds is undefined or null.
+    }
+
     return (
         <div className={styles.grid}>
             {tokenIds.map((tokenId: number, index: number) => (
