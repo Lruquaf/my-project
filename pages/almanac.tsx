@@ -1,5 +1,5 @@
 import { GetStaticProps, NextPage } from "next";
-import { getImagesData, ImageData } from "./imageData";
+import { ImageData } from "./imageData";
 import styles from "../styles/Home.module.css";
 import { MediaRenderer } from "@thirdweb-dev/react";
 import { useState } from "react";
@@ -76,7 +76,8 @@ const Almanac: NextPage<AlmanacProps> = ({ data }) => {
 };
 
 export const getStaticProps: GetStaticProps<AlmanacProps> = async () => {
-    const data = getImagesData();
+    const response = await fetch("/api/getImagesData");
+    const data = await response.json();
 
     return {
         props: {
